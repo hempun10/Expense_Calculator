@@ -4,12 +4,10 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 const schema = z.object({
-  name: z
+  description: z
     .string()
-    .min(3, { message: "Name must consists at least 3 character" }),
-  age: z
-    .number({ invalid_type_error: "Age field is required" })
-    .min(18, { message: "Number must be greater than 18 " }),
+    .min(3, { message: "Description must contains at least 3 character" }),
+  amount: z.number({ invalid_type_error: "Amount must be field is required" }),
 });
 
 type formData = z.infer<typeof schema>;
@@ -25,30 +23,35 @@ const FormCard = () => {
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <div className="mb-3">
-        <label htmlFor="name" className="form-label">
-          Name
+        <label htmlFor="description" className="form-label">
+          Description
         </label>
         <input
-          {...register("name")}
+          {...register("description")}
           type="text"
-          id="name"
+          id="description"
           className="form-control"
         />
-        {errors.name && <p className="text-danger">{errors.name.message}</p>}
+        {errors.description && (
+          <p className="text-danger">{errors.description.message}</p>
+        )}
       </div>
       <div className="mb-3">
         <label htmlFor="name" className="form-label">
-          Age
+          Amount
         </label>
         <input
-          {...register("age", { valueAsNumber: true })}
+          {...register("amount", { valueAsNumber: true })}
           type="number"
           id="name"
           className="form-control"
         />
-        {errors.age && <p className="text-danger">{errors.age.message}</p>}
+        {errors.amount && (
+          <p className="text-danger">{errors.amount.message}</p>
+        )}
       </div>
-      <button disabled={!isValid} type="submit" className=" btn btn-primary">
+
+      <button type="submit" className=" btn btn-primary">
         Submit
       </button>
     </form>
