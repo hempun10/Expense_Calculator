@@ -1,33 +1,44 @@
 import React, { FormEvent, useRef } from "react";
+import { useForm, FieldValues } from "react-hook-form";
 
 const FormCard = () => {
-  const nameRef = useRef<HTMLInputElement>(null);
-  const ageRef = useRef<HTMLInputElement>(null);
-  let person = { name: "", age: 0 };
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
+  // console.log(errors);
 
-  const handleSubmit = (event: FormEvent) => {
-    event.preventDefault();
-    if (nameRef.current) {
-      person.name = nameRef.current?.value ?? " ";
-    }
-    if (ageRef.current) {
-      person.age = parseInt(ageRef.current?.value ?? "0");
-    }
-    console.log(person);
-  };
+  const onSubmit = (data: FieldValues) => console.log(data);
+
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit(onSubmit)}>
       <div className="mb-3">
         <label htmlFor="name" className="form-label">
           Name
         </label>
-        <input ref={nameRef} type="text" id="name" className="form-control" />
+        <input
+          {...(register("name"), { required: true, minLength: 3 })}
+          type="text"
+          id="name"
+          className="form-control"
+        />
+        {errors.name?.type === "required" && <p>The name field is required</p>}
+        {errors.name?.type === "minLength" && (
+          <p>The name must be at least 3</p>
+        )}
       </div>
       <div className="mb-3">
         <label htmlFor="name" className="form-label">
           Age
         </label>
-        <input ref={ageRef} type="number" id="name" className="form-control" />
+        <input
+          {...(register("age"), { required: true })}
+          type="number"
+          id="name"
+          className="form-control"
+        />
+        {errors.age?.type === "required" && <p>The age field is required</p>}
       </div>
       <button type="submit" className=" btn btn-primary">
         Submit
