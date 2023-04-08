@@ -2,26 +2,38 @@ import React, { FormEvent, useRef } from "react";
 import { useForm, FieldValues } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { categories } from "../constants";
+
+interface Props {
+  onSubmit: (data: ExpenseFormData) => void;
+}
 
 const schema = z.object({
   description: z
     .string()
     .min(3, { message: "Description must contains at least 3 character" }),
   amount: z.number({ invalid_type_error: "Amount must be field is required" }),
+  category: z.enum(categories, {
+    errorMap: () => ({ message: "Category is required" }),
+  }),
 });
 
-type formData = z.infer<typeof schema>;
-const FormCard = () => {
+type ExpenseFormData = z.infer<typeof schema>;
+
+const ExpenseForm = ({ onSubmit }: Props) => {
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors, isValid },
-  } = useForm<formData>({ resolver: zodResolver(schema) });
-
-  const onSubmit = (data: FieldValues) => console.log(data);
-
+  } = useForm<ExpenseFormData>({ resolver: zodResolver(schema) });
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form
+      onSubmit={handleSubmit((data) => {
+        onSubmit(data);
+        reset();
+      })}
+    >
       <div className="mb-3">
         <label htmlFor="description" className="form-label">
           Description
@@ -50,6 +62,23 @@ const FormCard = () => {
           <p className="text-danger">{errors.amount.message}</p>
         )}
       </div>
+      <div className="mb-3">
+        <label htmlFor="category" className="form-label">
+          {" "}
+          Category
+        </label>
+        <select {...register("category")} id="category" className="form-select">
+          <option value=""></option>
+          {categories.map((categroy) => (
+            <option value={categroy} key={categroy}>
+              {categroy}
+            </option>
+          ))}
+        </select>
+        {errors.category && (
+          <p className="text-danger">{errors.category.message}</p>
+        )}
+      </div>
 
       <button type="submit" className=" btn btn-primary">
         Submit
@@ -58,4 +87,4 @@ const FormCard = () => {
   );
 };
 
-export default FormCard;
+export default ExpenseForm;
